@@ -1,0 +1,67 @@
+server:
+  port: 9090
+
+spring:
+  cloud:
+    config:
+      profile: ${config.profile:docker} # profile
+      name: log_queue,sleuth_queue      # 配置文件
+
+  rabbitmq:
+    host: ${sleuth.spring.rabbitmq.host:localhost}
+    port: ${sleuth.spring.rabbitmq.port:5762}
+    username: ${sleuth.spring.rabbitmq.username:guest}
+    password: ${sleuth.spring.rabbitmq.password:guest}
+
+    stream:
+      bindings:
+        sleuth:
+          destination: sleuth
+          binder: sleuthlog
+      binders:
+        sleuthlog:
+          type: rabbit
+          defaultCandidate: false
+          inheritEnvironment: false
+          environment:
+            spring:
+              cloud:
+                stream:
+                  rabbitmq:
+                    host: ${sleuth.spring.rabbitmq.host:localhost}
+                    port: ${sleuth.spring.rabbitmq.port:5762}
+                    username: ${sleuth.spring.rabbitmq.username:guest}
+                    password: ${sleuth.spring.rabbitmq.password:guest}
+        default:
+          type: rabbit
+          defaultCandidate: false
+          inheritEnvironment: false
+          environment:
+            spring:
+              cloud:
+                stream:
+                  rabbitmq:
+                    host: ${order.spring.rabbitmq.host:localhost}
+                    port: ${order.spring.rabbitmq.port:5762}
+                    username: ${order.spring.rabbitmq.username:guest}
+                    password: ${order.spring.rabbitmq.password:guest}
+      default-binder: default
+
+
+
+  sleuth:
+    enabled: ${sleuth.sample.enable:true}
+    sampler:
+      percentage: ${sleuth.sample.percentage:1.0}
+
+  redis:
+    database: 0
+    host: 192.168.99.100
+    port: 6379
+    pool:
+      max-active: 8
+      max-idle: 8
+      max-wait: 1000
+      min-idle: 0
+    timeout: 10000
+
